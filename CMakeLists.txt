@@ -27,7 +27,6 @@ add_subdirectory(gui)
 
 # The Qt5Widgets_INCLUDES also includes the include directories for
 # dependencies QtCore and QtGui
-#include_directories(${Qt5Widgets_INCLUDES} ${CMAKE_PROGRAM_PATH})
 include_directories(${PROJECT_SOURCE_DIR}/include
                     ${PROJECT_SOURCE_DIR}/gui/include
                     ${CMAKE_BINARY_DIR}/gui
@@ -40,10 +39,11 @@ add_definitions(${Qt5Widgets_DEFINITIONS})
 
 # Executables fail to build with Qt 5 in the default configuration
 # without -fPIE. We add that here.
-set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
-aux_source_directory(src SRC_LIST)
+set( PROJECT_SOURCES src/present_value.cpp)
+add_library(sources ${PROJECT_SOURCES})
 
-add_executable(${PROJECT_NAME} ${SRC_LIST})
-# The Qt5Widgets_LIBRARIES variable also includes QtGui and QtCore
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets gui)
+add_executable(       ${PROJECT_NAME} src/main.cpp)
+add_dependencies(     ${PROJECT_NAME} sources)
+target_link_libraries(${PROJECT_NAME} Qt5::Widgets gui sources)
