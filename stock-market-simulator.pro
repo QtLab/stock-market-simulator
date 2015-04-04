@@ -4,7 +4,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET   = stock-market-simulator
 TEMPLATE = app
-CONFIG  += qt
+CONFIG  += qt c++11
 
 INCLUDEPATH += ./src
 INCLUDEPATH += ./include
