@@ -45,6 +45,7 @@ public:
      * \param cflow_times   Instants of time.
      * \param cflow_amounts Cash flow at time \f$ t \f$.
      * \param r             Constant interest rate.
+     * \return The calculated present value
      *
      * \par One interest rate with annual compounding.
      *      The best known way to simplify the present value calculation is to rewrite the discount
@@ -60,15 +61,15 @@ public:
      *
      *      \f$ PV = \sum_{t=1}^{N}\frac{C_{t}}{(1+r)^{t}} \f$
      */
-    void cash_flow_pv_discrete(const std::vector<T>& cflow_times,
-                               const std::vector<T>& cflow_amounts,
-                               const T r)
+    T pv_discrete_cflow(const std::vector<T>& cflow_times,
+                        const std::vector<T>& cflow_amounts,
+                        const T r)
     {
         T present_value = 0.0;
         for (int t = 0; t < cflow_times.size(); t++) {
             present_value += cflow_amounts[t] / pow(1.0 + r, cflow_times[t]);
         }
-        this->present_value = present_value;
+        return present_value;
     }
 
     /**
@@ -76,6 +77,7 @@ public:
      *
      * \param cflow_amount  Payment in each period of time \f$ X \f$.
      * \param r             Constant interest rate.
+     * \return              The calculated present value
      *
      * \par A perpetuity is
      *      a promise of a payment of a fixed amount \f$ X \f$ each period of time for
@@ -84,18 +86,19 @@ public:
      *
      *      \f$ PV = \sum_{t=1}^{\infty}\frac{X}{(1+r)} = \frac{X}{r} \f$
      */
-    void pv_perpetuity(const T cflow_amount,
-                       const T r)
+    T pv_perpetuity(const T cflow_amount,
+                    const T r)
     {
-        this->present_value = cflow_amount / r;
+        return cflow_amount / r;
     }
 
     /**
      * \brief Calculates the present value considering a growing perpetuity with a fix interest rate.
      *
-     * \param cflow_amount  Initial payment \f$ X_{1} \f$.
-     * \param r             Constant interest rate.
-     * \param g             Constant growing rate.
+     * \param initial_cflow_amount  Initial payment \f$ X_{1} \f$.
+     * \param r                     Constant interest rate.
+     * \param g                     Constant growing rate.
+     * \return                      The calculated present value
      *
      * \par A growing perpetuity is
      *      an infinite sequence of cashflows, where the payment the first year is \f$ X \f$ and
@@ -105,11 +108,11 @@ public:
      *
      *      \f$ PV = \sum_{t=1}^{\infty}\frac{X(1+g)^{t-1}}{(1+r)^{t}} = \frac{X_{1}}{r-g} \f$
      */
-    void pv_growing_perpetuity(const T initial_cflow_amount,
-                               const T r,
-                               const T g)
+    T pv_growing_perpetuity(const T initial_cflow_amount,
+                            const T r,
+                            const T g)
     {
-        this->present_value = initial_cflow_amount / (r - g);
+        return initial_cflow_amount / (r - g);
     }
 
     /**
@@ -118,6 +121,7 @@ public:
      * \param cflow_amount  Payment in each period of time \f$ X \f$.
      * \param num_periods   Number of of periods \f$ T \f$ into the future.
      * \param r             Constant interest rate.
+     * \return              The calculated present value
      *
      * \par An annuity is
      *      a sequence of cashflows for a given number of years \f$ T \f$ periods into the future.
@@ -126,20 +130,21 @@ public:
      *
      *      \f$ PV = \sum_{t=1}^{T}\frac{X}{(1+r)^{t}} = X \lbrack \frac{1}{r}-\frac{1}{r}\frac{1}{(1+r)^{T}} \rbrack \f$
      */
-    void pv_annuity(const T cflow_amount,
-                    const T num_periods,
-                    const T r)
+    T pv_annuity(const T cflow_amount,
+                 const T num_periods,
+                 const T r)
     {
-        this->present_value = cflow_amount * ( (1/r) - (1 / (r * pow(1+r, num_periods)) ));
+        return cflow_amount * ( (1/r) - (1 / (r * pow(1+r, num_periods)) ));
     }
 
     /**
      * \brief Calculates the present value considering a growing annuity with a fix interest rate.
      *
-     * \param cflow_amount  Initial payment \f$ X_{1} \f$.
-     * \param num_periods   Number of of periods \f$ T \f$ into the future.
-     * \param r             Constant interest rate.
-     * \param g             Constant growing rate.
+     * \param initial_cflow_amount  Initial payment \f$ X_{1} \f$.
+     * \param num_periods           Number of of periods \f$ T \f$ into the future.
+     * \param r                     Constant interest rate.
+     * \param g                     Constant growing rate.
+     * \return                      The calculated present value
      *
      * \par A growing annuity is
      *      a sequence of cashflows for a given number of years \f$ T \f$ periods into the future,
@@ -150,12 +155,12 @@ public:
      *
      *      \f$ PV = \sum_{t=1}^{T}\frac{X(1+g)^{t-1}}{(1+r)^{t}} = X_{1} \lbrack \frac{1}{r-g}-(\frac{1+g}{1+r})^{T}\frac{1}{r-g} \rbrack \f$
      */
-    void pv_growing_annuity(const T cflow_amount,
-                            const T num_periods,
-                            const T r,
-                            const T g)
+    T pv_growing_annuity(const T initial_cflow_amount,
+                         const T num_periods,
+                         const T r,
+                         const T g)
     {
-        this->present_value = cflow_amount * ((1/(r-g) - pow((1+g)/(1+r), num_periods) * (1/(r-g)) ));
+        return initial_cflow_amount * ((1/(r-g) - pow((1+g)/(1+r), num_periods) * (1/(r-g)) ));
     }
 
 private:

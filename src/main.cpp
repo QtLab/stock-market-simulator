@@ -3,6 +3,7 @@
 #include "present_value.hpp"
 
 #include <vector>
+#include <iostream>
 
 int main(int argc, char *argv[])
 {
@@ -18,7 +19,7 @@ int main(int argc, char *argv[])
     for (unsigned i = 0; i < time.size(); i++) time[i] = i;
 
     float res = 0.1;
-    pv.cash_flow_pv_discrete(time, amounts, res);
+    std::cout << pv.pv_discrete_cflow(time, amounts, res) << std::endl;
 
     return a.exec();
 }
