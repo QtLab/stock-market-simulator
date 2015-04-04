@@ -41,6 +41,46 @@ class PresentValue
 public:
 
     /**
+     * \brief Calculates whether the combination of cash flows has a real solution.
+     *
+     * \param cflow_times   Instants of time.
+     * \param cflow_amounts Cash flow at time \f$ t \t$
+     * \return True if there is a real solution, flalse if a complex solution is found or if there is no soluton at all.
+     *
+     * \par
+     *      The polinomical equation solved in the calculus of IRR can give complex solutions.
+     *      To see whether we are likely to have problems in identifying a single meaningful IRR.
+     * \par
+     *      The first test is just to count the number of sign changes in the cash flow.
+     *      From Descartes rule we know that the number of real roots is one if there is only
+     *      one sign change. If there is more than one change in the sign of cash flows, we can
+     *      go further and check the aggregated cash flows for sign changes.
+     *
+     */
+    bool unique_discrete_irr(const std::vector<T>& cflow_times,
+                             const std::vector<T>& cflow_amounts)
+    {
+        int sign_changes = 0;
+        for (int t = 1; t < cflow_times.size(); t++) {
+            if (std::signbit(cflow_amounts[t-1]) xor std::signbit(cflow_amounts[t]))
+                sign_changes++;
+        }
+        if (sign_changes == 0) return false;
+        if (sign_changes == 1) return true;
+
+        T A = cflow_amounts[0];
+        T B = A;
+        sign_changes = 0;
+        for (int t = 1; t < cflow_times.size(); t++) {
+            B += cflow_amounts[t];
+            if (std::signbit(A) xor std::signbit(B))
+                sign_changes++;
+        }
+        if (sign_changes <= 1) return true;
+        return false;
+    }
+
+    /**
      * \brief Calculates the internal rate of return.
      *
      * \param cflow_times   Instants of time.

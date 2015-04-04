@@ -27,9 +27,14 @@ int main(int argc, char *argv[])
     float res = 0.05;
     float pvv = pv.pv_discrete_cflow(time, amounts, res);
     float irr = pv.irr_discrete_cflow(time,amounts);
+    bool  found = pv.unique_discrete_irr(time,amounts);
 
     std::cout << "Present value, 5 persent discretely compounded interest = " << pvv << std::endl;
     std::cout << "Internal rate of return, discrete compounding = " << irr << std::endl;
+    if (found)
+        std::cout << "Real solution found" << std::endl;
+    else
+        std::cout << "No meaningful solution found" << std::endl;
 
     return a.exec();
 }
