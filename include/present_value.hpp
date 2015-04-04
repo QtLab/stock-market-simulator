@@ -58,17 +58,60 @@ public:
      *      \f$ d_{t} = \frac{1}{(1+r)^{t}} \f$
      *      Then the present value of a stream of cash flow paid at discrete dates \f$ t = 1,2,..N \f$ is:
      *
-     *      \f$ PV = \sum_{i=0}^{N}\frac{C_{t_{i}}}{(1+r)^{t}} \f$
+     *      \f$ PV = \sum_{t=1}^{N}\frac{C_{t}}{(1+r)^{t}} \f$
      */
     void cash_flow_pv_discrete(const std::vector<T>& cflow_times,
                                const std::vector<T>& cflow_amounts,
-                               T r)
+                               const T r)
     {
-        this->present_value = 0.0;
+        T present_value = 0.0;
         for (int t = 0; t < cflow_times.size(); t++) {
-            this->present_value += cflow_amounts[t] / pow(1.0 + r, cflow_times[t]);
+            present_value += cflow_amounts[t] / pow(1.0 + r, cflow_times[t]);
         }
+        this->present_value = present_value;
     }
+
+    /**
+     * \brief Calculates the present value considering a perpetuity with a fix interest rate.
+     *
+     * \param cflow_amount  Payment in each period of time \f$ X \f$.
+     * \param r             Constant interest rate.
+     *
+     * \par A perpetuity is
+     *      a promise of a payment of a fixed amount \f$ X \f$ each period of time for
+     *      the indefinite future. Supposing there is a fixed interest rate \f$ r \f$, the present
+     *      value of this sequence of cash flows is calculated as
+     *
+     *      \f$ PV = \sum_{t=1}^{\infty}\frac{X}{(1+r)} = \frac{X}{r} \f$
+     */
+    void pv_perpetuity(const T cflow_amount,
+                       const T r)
+    {
+        this->present_value = cflow_amount / r;
+    }
+
+    /**
+     * \brief Calculates the present value considering a growing perpetuity with a fix interest rate.
+     *
+     * \param cflow_amount  Initial payment \f$ X_{1} \f$.
+     * \param r             Constant interest rate.
+     * \param g             Constant growing rate.
+     *
+     * \par A growing perpetuity is
+     *      an infinite sequence of cashflows, where the payment the first year is \f$ X \f$ and
+     *      each consequent payment grows by a constant rate \f$ g \f$.
+     *      Supposing there is a fixed interest rate \f$ r \f$, the present value of this sequence
+     *      of cash flows is calculated as
+     *
+     *      \f$ PV = \sum_{t=1}^{\infty}\frac{X(1+g)^{t-1}}{(1+r)^{t}} = \frac{X_{1}}{r-g} \f$
+     */
+    void pv_growing_perpetuity(const T initial_cflow_amount,
+                               const T r,
+                               const T g)
+    {
+        this->present_value = initial_cflow_amount / (r - g);
+    }
+
 private:
     T present_value;
 };
