@@ -112,6 +112,52 @@ public:
         this->present_value = initial_cflow_amount / (r - g);
     }
 
+    /**
+     * \brief Calculates the present value considering a annuity with a fix interest rate.
+     *
+     * \param cflow_amount  Payment in each period of time \f$ X \f$.
+     * \param num_periods   Number of of periods \f$ T \f$ into the future.
+     * \param r             Constant interest rate.
+     *
+     * \par An annuity is
+     *      a sequence of cashflows for a given number of years \f$ T \f$ periods into the future.
+     *      Consider an annuity paying a fixed amount \f$ X \f$ each period at a fixed interest
+     *      rate \f$ r \f$. The present value of this sequence of cash flows is calculated as
+     *
+     *      \f$ PV = \sum_{t=1}^{T}\frac{X}{(1+r)^{t}} = X \lbrack \frac{1}{r}-\frac{1}{r}\frac{1}{(1+r)^{T}} \rbrack \f$
+     */
+    void pv_annuity(const T cflow_amount,
+                    const T num_periods,
+                    const T r)
+    {
+        this->present_value = cflow_amount * ( (1/r) - (1 / (r * pow(1+r, num_periods)) ));
+    }
+
+    /**
+     * \brief Calculates the present value considering a growing annuity with a fix interest rate.
+     *
+     * \param cflow_amount  Initial payment \f$ X_{1} \f$.
+     * \param num_periods   Number of of periods \f$ T \f$ into the future.
+     * \param r             Constant interest rate.
+     * \param g             Constant growing rate.
+     *
+     * \par A growing annuity is
+     *      a sequence of cashflows for a given number of years \f$ T \f$ periods into the future,
+     *      where each payment grows by a given factor each year. Consider a T-period annuity that
+     *      pays \f$ X \f$ the first period. After that, the payments grows at a rate \f$ g \$g per year
+     *      with a fix interest rate \f$ r \f$. The present value of this sequence of cash flows is
+     *      calculated as
+     *
+     *      \f$ PV = \sum_{t=1}^{T}\frac{X(1+g)^{t-1}}{(1+r)^{t}} = X_{1} \lbrack \frac{1}{r-g}-(\frac{1+g}{1+r})^{T}\frac{1}{r-g} \rbrack \f$
+     */
+    void pv_growing_annuity(const T cflow_amount,
+                            const T num_periods,
+                            const T r,
+                            const T g)
+    {
+        this->present_value = cflow_amount * ((1/(r-g) - pow((1+g)/(1+r), num_periods) * (1/(r-g)) ));
+    }
+
 private:
     T present_value;
 };
