@@ -39,13 +39,43 @@ template <class T>
 class PresentValue
 {
 public:
+    /**
+     * \brief Calculates the present value considering a continuously compounded interest.
+     *
+     * \param cflow_times   Instants of time.
+     * \param cflow_amounts Cash flow at time \f$ t \f$.
+     * \param r             Constant interest rate.
+     * \return              The calculated present value
+     *
+     * \par Continuously compounded interest.
+     *      The interest is added continuously. Given an interest rate \f$ r \f$, the current
+     *      price of reciving one euro at a future date \f$ t \f$ is
+     *
+     *      \f$ d_{t} = e^{-rt} \f$
+     * \par
+     *      Appliying this to a set of cash flows at future dates \f$ t_{1},t_{2},...,t_{n} \f$ we
+     *      get the following present value calculation:
+     *
+     *      \f$ PV = \sum_{i=1}^{n}e^{-rt_{i}}C_{t_{i}} \f$
+     */
+    T pv_continuous_cflow(const std::vector<T>& cflow_times,
+                          const std::vector<T>& cflow_amounts,
+                          const T r)
+    {
+        T present_value = 0.0;
+        for (int t = 0; t < cflow_times.size(); t++) {
+            present_value += cflow_amounts[t] * exp(-r * cflow_times[t]);
+        }
+        return present_value;
+    }
 
     /**
      * \brief Calculates whether the combination of cash flows has a real solution.
      *
      * \param cflow_times   Instants of time.
-     * \param cflow_amounts Cash flow at time \f$ t \t$
-     * \return True if there is a real solution, flalse if a complex solution is found or if there is no soluton at all.
+     * \param cflow_amounts Cash flow at time \f$ t \f$
+     * \return              True if there is a real solution,
+     *                      Flalse if a complex solution is found or if there is no soluton at all.
      *
      * \par
      *      The polinomical equation solved in the calculus of IRR can give complex solutions.
@@ -99,6 +129,7 @@ public:
      *      return is finding a solution \f$ y \f$ of the equation:
      *
      *      \f$ \sum_{t=1}^{T}\frac{C_{t}}{(1+y)^{t}}-C_{0} = 0 \f$
+     *
      * \par
      *      This is a polinomical equation that we solve numerically. For well behaved cash flows, we
      *      know that there is one IRR, we find the IRR using an iterative bisection process.
@@ -184,6 +215,7 @@ public:
         return present_value;
     }
 
+
     /**
      * \brief Calculates the present value considering a perpetuity with a fix interest rate.
      *
@@ -261,7 +293,7 @@ public:
      * \par A growing annuity is
      *      a sequence of cashflows for a given number of years \f$ T \f$ periods into the future,
      *      where each payment grows by a given factor each year. Consider a T-period annuity that
-     *      pays \f$ X \f$ the first period. After that, the payments grows at a rate \f$ g \$g per year
+     *      pays \f$ X \f$ the first period. After that, the payments grows at a rate \f$ g \f$ per year
      *      with a fix interest rate \f$ r \f$. The present value of this sequence of cash flows is
      *      calculated as
      *
