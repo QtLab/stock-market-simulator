@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 
     for (unsigned i = 0; i < time.size(); i++) time[i] = i;
 
-    float res;
+    float res = 0.1;
     pv.cash_flow_pv_discrete(time, amounts, res);
 
     return a.exec();
