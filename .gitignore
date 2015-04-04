@@ -1,2 +1,4 @@
 build
 stock-market-simulator.pro.user
+doc/doc/*
+doc/doxygen/doc/*

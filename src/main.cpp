@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    PresentValue<float> pv;
+    finance::PresentValue<float> pv;
 
     std::vector<float> time(1000);
     std::vector<float> amounts(1000, 1);
