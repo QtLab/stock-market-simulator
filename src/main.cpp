@@ -13,13 +13,23 @@ int main(int argc, char *argv[])
 
     finance::PresentValue<float> pv;
 
-    std::vector<float> time(1000);
-    std::vector<float> amounts(1000, 1);
+    std::vector<float> time;
+    std::vector<float> amounts;
 
-    for (unsigned i = 0; i < time.size(); i++) time[i] = i;
+    time.push_back(0.0);
+    time.push_back(1.0);
+    time.push_back(2.0);
 
-    float res = 0.1;
-    std::cout << pv.pv_discrete_cflow(time, amounts, res) << std::endl;
+    amounts.push_back(-100.0);
+    amounts.push_back(  10.0);
+    amounts.push_back( 110.0);
+
+    float res = 0.05;
+    float pvv = pv.pv_discrete_cflow(time, amounts, res);
+    float irr = pv.irr_discrete_cflow(time,amounts);
+
+    std::cout << "Present value, 5 persent discretely compounded interest = " << pvv << std::endl;
+    std::cout << "Internal rate of return, discrete compounding = " << irr << std::endl;
 
     return a.exec();
 }

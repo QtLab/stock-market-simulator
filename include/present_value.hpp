@@ -9,7 +9,7 @@
 #include <cmath>
 #include <vector>
 #include <iostream>
-
+#include <stdexcept>
 
 
 
@@ -39,24 +39,96 @@ template <class T>
 class PresentValue
 {
 public:
+
+    /**
+     * \brief Calculates the internal rate of return.
+     *
+     * \param cflow_times   Instants of time.
+     * \param cflow_amounts Cash flow at time \f$ t \f$.
+     * \exception std::invalid_argument if parameter sizes differ
+     * \exception std::domain_error if an internall error occurrs.
+     * \return              The calculated internal rate of return.
+     *
+     * \par Internal rate of return.
+     *      The percentage return on an investment is a summary measure of the investment's profitability.
+     *      The return is a relative measure of profitability. To estimate a return for a set of cash flows
+     *      we calculate the <em>internal rate of return</em>. The internal rate of return for a set of
+     *      cash flows is the interest rate that makes the present value of the cash flows equal to zero.
+     * \par
+     *      Suppose the cash flows are \f$ C_{0},C_{1},C_{2},...C_{T} \f$. Finding an internal rate of
+     *      return is finding a solution \f$ y \f$ of the equation:
+     *
+     *      \f$ \sum_{t=1}^{T}\frac{C_{t}}{(1+y)^{t}}-C_{0} = 0 \f$
+     * \par
+     *      This is a polinomical equation that we solve numerically. For well behaved cash flows, we
+     *      know that there is one IRR, we find the IRR using an iterative bisection process.
+     */
+    T irr_discrete_cflow(const std::vector<T>& cflow_times,
+                         const std::vector<T>& cflow_amounts)
+    {
+        if (cflow_times.size() != cflow_amounts.size())
+            throw std::invalid_argument("sizes differ");
+
+        const T ACCURACY = 1.0e-5;
+        const int MAX_ITERATIONS = 50;
+        T x1 = 0.0;
+        T x2 = 0.2;
+
+        T f1 = pv_discrete_cflow(cflow_times, cflow_amounts, x1);
+        T f2 = pv_discrete_cflow(cflow_times, cflow_amounts, x2);
+        for (int i = 0; i < MAX_ITERATIONS and (f1*f2) >= 0.0; i++) {
+            if (fabs(f1) < fabs(f2))
+                f1 = pv_discrete_cflow(cflow_times, cflow_amounts, x1+=1.6*(x1-x2));
+            else
+                f2 = pv_discrete_cflow(cflow_times, cflow_amounts, x2+=1.6*(x2-x1));
+        }
+        if (f1*f2 > 0.0)
+            throw std::domain_error("f1 & f2 are wrong");
+
+        T f = pv_discrete_cflow(cflow_times, cflow_amounts, x1);
+        T rtb;
+        T dx=0;
+        if (f < 0.0) {
+            rtb = x1;
+            dx  = x2-x1;
+        } else {
+            rtb = x2;
+            dx  = x1-x2;
+        }
+        for (int i = 0; i < MAX_ITERATIONS; i++) {
+            dx *= 0.5;
+            T x_mid = rtb + dx;
+            T f_mid = pv_discrete_cflow(cflow_times, cflow_amounts, x_mid);
+            if (f_mid <= 0.0)
+                rtb = x_mid;
+            if ((fabs(f_mid) < ACCURACY) or (fabs(dx) < ACCURACY))
+                return x_mid;
+        }
+        throw std::domain_error("Solution not found");
+    }
+
     /**
      * \brief Calculates the present value considering one interest rate with annual compounding.
      *
      * \param cflow_times   Instants of time.
      * \param cflow_amounts Cash flow at time \f$ t \f$.
      * \param r             Constant interest rate.
-     * \return The calculated present value
+     * \return              The calculated present value
      *
      * \par One interest rate with annual compounding.
      *      The best known way to simplify the present value calculation is to rewrite the discount
      *      factors int terms of interest rates, or yields, througt the relationship:
+     *
      *      \f$ d_{t} = \frac{1}{(1+r_{t})^{t}} \f$
+     * \par
      *      where \f$ r_{t} \f$ is the interest rate (usually termed the spot rate) relevant for
      *      a t-period investment. To further simplify this calculation one can impose that this
      *      interest rate r is constant for all periods. This is termed a <em>flat</em> term
      *      structure. The prices for valuing the future payments \f$ d_{t} \f$ is calculated from
      *      this interest rate:
+     *
      *      \f$ d_{t} = \frac{1}{(1+r)^{t}} \f$
+     * \par
      *      Then the present value of a stream of cash flow paid at discrete dates \f$ t = 1,2,..N \f$ is:
      *
      *      \f$ PV = \sum_{t=1}^{N}\frac{C_{t}}{(1+r)^{t}} \f$
