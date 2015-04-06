@@ -1,6 +1,8 @@
 #include <QApplication>
 #include "main_window.hpp"
 #include "present_value.hpp"
+#include "date.hpp"
+#include "dated.hpp"
 
 #include <vector>
 #include <iostream>

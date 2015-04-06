@@ -13,10 +13,12 @@ INCLUDEPATH += ./gui/include
 INCLUDEPATH += ./gui/layout
 
 SOURCES += src/main.cpp \
-           #src/present_value.cpp \
+           src/date.cpp \
            gui/src/main_window.cpp
 
 HEADERS += include/present_value.hpp \
+           include/date.hpp \
+           include/dated.hpp \
            gui/include/main_window.hpp
 
 FORMS   += gui/layout/main_window.ui
