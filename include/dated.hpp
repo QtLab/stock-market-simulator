@@ -32,6 +32,9 @@ public:
     typename std::vector<T>::iterator first_element() const;
     typename std::vector<T>::iterator last_element() const;
 
+    const std::vector<Date>& get_dates();
+    const std::vector<T>& get_elements();
+
     int index_of_date(const Date& d) const;
     //int index_of_last_date_before(const date& d) const; // these are useful functions
     //int index_of_first_date_after(const date& d) const;
@@ -155,6 +158,18 @@ template <typename T>
 typename std::vector<T>::iterator Dated<T>::last_element() const
 {
     return elements.end();
+}
+
+template <typename T>
+const std::vector<Date>& Dated<T>::get_dates()
+{
+    return dates;
+}
+
+template <typename T>
+const std::vector<T>& Dated<T>::get_elements()
+{
+    return elements;
 }
 
 template <typename T>
